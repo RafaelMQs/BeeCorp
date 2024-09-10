@@ -1,4 +1,4 @@
-package br.com.beecorp;
+package br.com.beecorp.ExampleScreen;
 
 import br.com.beecorp.jdbc.JdbcConnection;
 
