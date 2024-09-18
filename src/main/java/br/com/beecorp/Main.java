@@ -1,7 +1,7 @@
 package br.com.beecorp;
 
-import br.com.beecorp.ExampleScreen.ExampleScreen;
 import br.com.beecorp.jdbc.JdbcConnection;
+import br.com.beecorp.user.UserLoginScreen;
 import com.formdev.flatlaf.FlatDarculaLaf;
 
 import javax.swing.*;
@@ -11,11 +11,11 @@ import java.sql.SQLException;
 
 public class Main {
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
         // Install a new style for all Java Swing Components
         FlatDarculaLaf.setup();
 
-        ExampleScreen frame = new ExampleScreen();
+        UserLoginScreen frame = new UserLoginScreen();
         frame.setVisible(true);
         frame.setTitle("BeeCorp");
         frame.setContentPane(frame.mainPanel);
@@ -25,7 +25,7 @@ public class Main {
         frame.pack();
     }
 
-    private static void setFrameWindowListener(ExampleScreen frame) {
+    private static void setFrameWindowListener(UserLoginScreen frame) {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
