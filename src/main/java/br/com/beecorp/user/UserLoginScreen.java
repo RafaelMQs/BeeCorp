@@ -7,6 +7,7 @@ public class UserLoginScreen extends JFrame{
     private JTextField userNameInput;
     private JPasswordField userPasswordInput;
     private JButton loginButton;
+    private JButton registerButton;
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
