@@ -15,6 +15,11 @@ public class Main {
         // Install a new style for all Java Swing Components
         FlatDarculaLaf.setup();
 
+//        Bcrypt Example
+//        String teste = BCrypt.hashpw("teste", BCrypt.gensalt());
+//        System.out.println(teste);
+//        System.out.println(BCrypt.checkpw("teste", teste));
+
         UserLoginScreen frame = new UserLoginScreen();
         frame.setVisible(true);
         frame.setTitle("BeeCorp");

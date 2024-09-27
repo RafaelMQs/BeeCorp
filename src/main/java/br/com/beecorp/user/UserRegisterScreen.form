@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="br.com.beecorp.user.UserRegisterScreen">
-  <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="16" column-count="8" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="17" column-count="8" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="94" y="20" width="426" height="511"/>
+      <xy x="94" y="20" width="426" height="514"/>
     </constraints>
-    <properties/>
+    <properties>
+      <preferredSize width="600" height="600"/>
+    </properties>
     <border type="none"/>
     <children>
       <component id="6a3fb" class="javax.swing.JTextField" binding="userNameInput">
@@ -144,6 +146,22 @@
         </constraints>
         <properties>
           <text value="Cep: "/>
+        </properties>
+      </component>
+      <component id="1e036" class="javax.swing.JButton" binding="backButton">
+        <constraints>
+          <grid row="16" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Voltar"/>
+        </properties>
+      </component>
+      <component id="d6ed9" class="javax.swing.JButton" binding="registerButton">
+        <constraints>
+          <grid row="16" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Registrar"/>
         </properties>
       </component>
     </children>

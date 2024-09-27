@@ -1,8 +1,12 @@
 package br.com.beecorp.user;
 
-import javax.swing.*;
+import br.com.beecorp.models.DefaultScreenAbstract;
+import br.com.beecorp.models.DefaultScreenInterface;
 
-public class UserScreen {
+import javax.swing.*;
+import java.awt.*;
+
+public class UserScreen extends DefaultScreenAbstract implements DefaultScreenInterface {
     private JPanel mainPanel;
     private JTextField userIdInput;
     private JTextField userEmailInput;
@@ -12,7 +16,15 @@ public class UserScreen {
     private JTable resultTable;
     private JButton searchUserButton;
 
-    private void createUIComponents() {
+    @Override
+    public void createUIComponents() {
         // TODO: place custom component creation code here
+        mainPanel.setBackground(Color.BLACK);
     }
+
+    @Override
+    public void actionListeners() {
+        // TODO: place button actions component creation code here
+    }
+
 }
