@@ -1,4 +1,4 @@
-package br.com.beecorp.user;
+package br.com.beecorp.screens.auth;
 
 import br.com.beecorp.jdbc.JdbcConnection;
 import br.com.beecorp.models.DefaultScreenAbstract;
@@ -14,8 +14,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class UserRegisterScreen extends DefaultScreenAbstract implements DefaultScreenInterface {
+    private static final Logger log = Logger.getLogger(UserRegisterScreen.class.getName());
+
     public JPanel mainPanel;
     private JTextField userNameInput;
     private JTextField userEmailInput;
@@ -29,12 +32,15 @@ public class UserRegisterScreen extends DefaultScreenAbstract implements Default
     private JButton registerButton;
 
     public UserRegisterScreen() {
+        log.info("Open User Register Screen");
+
         createUIComponents();
         actionListeners();
     }
 
     @Override
     public void createUIComponents() {
+        this.setSize(600, 600);
         // TODO: place custom component creation code here
     }
 
@@ -45,13 +51,8 @@ public class UserRegisterScreen extends DefaultScreenAbstract implements Default
             @Override
             public void actionPerformed(ActionEvent e) {
                 UserLoginScreen frame = new UserLoginScreen();
-                frame.setVisible(true);
-                frame.setTitle("BeeCorp");
                 frame.setContentPane(frame.mainPanel);
-                frame.setLocationRelativeTo(null);
-                frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-                frame.pack();
-                setFrameWindowListener(frame);
+                createFrame(frame, "BeeCorp");
                 closeFrame(UserRegisterScreen.this);
             }
         });

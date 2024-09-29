@@ -1,7 +1,7 @@
 package br.com.beecorp;
 
 import br.com.beecorp.jdbc.JdbcConnection;
-import br.com.beecorp.user.UserLoginScreen;
+import br.com.beecorp.screens.auth.UserLoginScreen;
 import com.formdev.flatlaf.FlatDarculaLaf;
 
 import javax.swing.*;

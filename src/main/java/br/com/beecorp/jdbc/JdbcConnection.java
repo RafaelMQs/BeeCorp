@@ -17,7 +17,6 @@ public class JdbcConnection {
     private static Connection conn;
 
     public static Connection getConnection() throws SQLException {
-        log.setLevel(Level.FINE);
         try {
             if (conn == null) {
                 conn = DriverManager.getConnection(datasourceUrl + datasourceName, datasourceUsername, datasourcePassword);

@@ -9,6 +9,15 @@ import java.sql.SQLException;
 
 public abstract class DefaultScreenAbstract extends JFrame {
 
+    protected void createFrame(JFrame frame, String frameName){
+        frame.setVisible(true);
+        frame.setTitle(frameName);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.pack();
+        setFrameWindowListener(frame);
+    }
+
     protected void closeFrame(JFrame frame) {
         frame.setVisible(false);
     }
