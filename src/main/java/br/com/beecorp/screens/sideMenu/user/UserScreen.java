@@ -4,6 +4,7 @@ import br.com.beecorp.jdbc.JdbcConnection;
 import br.com.beecorp.models.DefaultScreenAbstract;
 import br.com.beecorp.models.DefaultScreenInterface;
 import br.com.beecorp.models.UserModel;
+import br.com.beecorp.screens.sideMenu.user.modals.UserEditModal;
 import br.com.beecorp.screens.sideMenu.user.modals.UserRegisterModal;
 import br.com.beecorp.screens.sideMenu.user.models.ResultTableModel;
 
@@ -40,7 +41,6 @@ public class UserScreen extends DefaultScreenAbstract implements DefaultScreenIn
         userModels = getFilteredUsers(null, null);
         resultTableModel = new ResultTableModel(userModels);
         resultTable.setModel(resultTableModel);
-
         resultTable.setAutoCreateRowSorter(true);
 
         createUIComponents();
@@ -79,21 +79,63 @@ public class UserScreen extends DefaultScreenAbstract implements DefaultScreenIn
                 UserRegisterModal frame = new UserRegisterModal();
                 frame.setContentPane(frame.mainPanel);
                 createFrame(frame, "BeeCorp", false);
-                frame.addWindowListener(new WindowAdapter() {
-                    @Override
-                    public void windowClosing(WindowEvent e) {
-                        try {
-                            JdbcConnection.closeConnection(JdbcConnection.getConnection());
-                        } catch (SQLException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                        e.getWindow().dispose();
-                        userModels.clear();
-                        userModels.addAll(getFilteredUsers(null, null));
-                        resultTableModel.fireTableDataChanged();
-                    }
-                });
                 closeFrame(UserScreen.this);
+                closeWindowAndUpdateTable(frame);
+            }
+        });
+
+        updateUserButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Integer selectedRow = resultTable.getSelectedRow();
+
+                if (selectedRow < 0) {
+                    JOptionPane.showMessageDialog(null, "Por favor, selecione um resultado",
+                            "Alerta de Erro", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    UserEditModal frame = new UserEditModal(userModels.get(resultTable.getSelectedRow()));
+                    frame.setContentPane(frame.mainPanel);
+                    createFrame(frame, "BeeCorp", false);
+                    closeFrame(UserScreen.this);
+                    closeWindowAndUpdateTable(frame);
+                }
+
+            }
+        });
+
+        deleteUserButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Integer selectedRow = resultTable.getSelectedRow();
+
+                if (selectedRow < 0) {
+                    JOptionPane.showMessageDialog(null, "Por favor, selecione um resultado",
+                            "Alerta de Erro", JOptionPane.WARNING_MESSAGE);
+                } else {
+
+                    UserModel userModel = userModels.get(resultTable.getSelectedRow());
+
+                    try {
+                        String sql = "UPDATE bee_manager_system.tb_users" +
+                                " SET" +
+                                " user_active = false" +
+                                " WHERE id_user = ?;";
+
+                        PreparedStatement ps = JdbcConnection.getConnection().prepareStatement(sql);
+                        ps.setInt(1, userModel.getUserId());
+                        ps.executeUpdate();
+                        ps.close();
+
+                        JOptionPane.showMessageDialog(null, "Usuario deletado com sucesso",
+                                "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+
+                        updateTable(getFilteredUsers(null, null));
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Houve um erro na conexão com o banco de dados",
+                                "Alerta de Erro", JOptionPane.WARNING_MESSAGE);
+                    }
+                }
             }
         });
     }
@@ -105,26 +147,30 @@ public class UserScreen extends DefaultScreenAbstract implements DefaultScreenIn
             if ((Objects.nonNull(userId) && !userId.isEmpty())
                     && (Objects.isNull(userEmail) || userEmail.isEmpty())) {
                 sql = "SELECT * FROM bee_manager_system.tb_users" +
-                        " WHERE id_user = ?";
+                        " WHERE id_user = ?" +
+                        " AND user_active = true";
                 ps = JdbcConnection.getConnection().prepareStatement(sql);
                 ps.setString(1, userId);
 
             } else if ((Objects.nonNull(userEmail) && !userEmail.isEmpty())
                     && (Objects.isNull(userId) || userId.isEmpty())) {
                 sql = "SELECT * FROM bee_manager_system.tb_users" +
-                        " WHERE ds_email = ?";
+                        " WHERE ds_email = ?" +
+                        " AND user_active = true";
                 ps = JdbcConnection.getConnection().prepareStatement(sql);
                 ps.setString(1, userEmail);
-            } else if((Objects.nonNull(userEmail) && !userEmail.isEmpty())
-                    && (Objects.nonNull(userId) && !userId.isEmpty())){
+            } else if ((Objects.nonNull(userEmail) && !userEmail.isEmpty())
+                    && (Objects.nonNull(userId) && !userId.isEmpty())) {
                 sql = "SELECT * FROM bee_manager_system.tb_users" +
                         " WHERE id_user = ?" +
-                        " AND ds_email = ?;";
+                        " AND ds_email = ?" +
+                        " AND user_active = true;";
                 ps = JdbcConnection.getConnection().prepareStatement(sql);
                 ps.setString(1, userId);
                 ps.setString(2, userEmail);
-            } else{
-                sql = "SELECT * FROM bee_manager_system.tb_users;";
+            } else {
+                sql = "SELECT * FROM bee_manager_system.tb_users" +
+                        " WHERE user_active = true;";
                 ps = JdbcConnection.getConnection().prepareStatement(sql);
             }
 
@@ -139,7 +185,8 @@ public class UserScreen extends DefaultScreenAbstract implements DefaultScreenIn
                 userModel.setUserEmail(rs.getString("ds_email"));
                 userModel.setUserPassword(rs.getString("ps_password"));
                 userModel.setUserPhone(rs.getString("nr_phone"));
-                userModel.setUserZipCode(rs.getString("ds_address"));
+                userModel.setUserZipCode(rs.getString("nr_cep"));
+                userModel.setUserAddress(rs.getString("ds_address"));
                 userModel.setUserCreationDate(rs.getDate("dt_creation"));
                 userModel.setUserActive(rs.getBoolean("user_active"));
                 userModels.add(userModel);
@@ -153,6 +200,27 @@ public class UserScreen extends DefaultScreenAbstract implements DefaultScreenIn
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    void updateTable(List<UserModel> userModelsData){
+        userModels.clear();
+        userModels.addAll(userModelsData);
+        resultTableModel.fireTableDataChanged();
+    }
+
+    void closeWindowAndUpdateTable(JFrame frame) {
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                try {
+                    JdbcConnection.closeConnection(JdbcConnection.getConnection());
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+                e.getWindow().dispose();
+                updateTable(getFilteredUsers(null, null));
+            }
+        });
     }
 
 }
