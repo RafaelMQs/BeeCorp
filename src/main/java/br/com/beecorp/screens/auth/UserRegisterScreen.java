@@ -4,19 +4,18 @@ import br.com.beecorp.jdbc.JdbcConnection;
 import br.com.beecorp.models.DefaultScreenAbstract;
 import br.com.beecorp.models.DefaultScreenInterface;
 import br.com.beecorp.models.UserRegisterModel;
-import com.mysql.cj.util.StringUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UserRegisterScreen extends DefaultScreenAbstract implements DefaultScreenInterface {
     private static final Logger log = Logger.getLogger(UserRegisterScreen.class.getName());
@@ -54,7 +53,7 @@ public class UserRegisterScreen extends DefaultScreenAbstract implements Default
             public void actionPerformed(ActionEvent e) {
                 UserLoginScreen frame = new UserLoginScreen();
                 frame.setContentPane(frame.mainPanel);
-                createFrame(frame, "BeeCorp");
+                createFrame(frame, "BeeCorp", false);
                 closeFrame(UserRegisterScreen.this);
             }
         });
@@ -84,60 +83,59 @@ public class UserRegisterScreen extends DefaultScreenAbstract implements Default
                     JOptionPane.showMessageDialog(null, "A senha de confirmação e a senha devem ser iguais",
                             "Alerta de Erro", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    try {
-                        String sql = "INSERT INTO bee_manager_system.tb_users(nm_user,user_role,ds_email,ps_password,nr_phone,nr_cep,ds_address,dt_creation)" +
-                                "VALUES(?,?,?,?,?,?,?,?);";
+                    Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+                    Matcher emailMatcher = VALID_EMAIL_ADDRESS_REGEX.matcher(registerModel.getUserEmail());
 
-                        PreparedStatement ps = JdbcConnection.getConnection().prepareStatement(sql);
-                        ps.setString(1, registerModel.getUserName());
-                        ps.setString(2, "NORMAL");
-                        ps.setString(3, registerModel.getUserEmail());
-                        ps.setString(4, registerModel.getUserPassword());
-                        ps.setString(5, registerModel.getUserPhone());
-                        ps.setString(6, registerModel.getUserZipCode());
-                        ps.setString(7, registerModel.getUserAddress());
-                        ps.setDate(8, new java.sql.Date(System.currentTimeMillis()));
-                        ps.executeUpdate();
-                        ps.close();
-
-                        JOptionPane.showMessageDialog(null, "Usuario cadastrado com sucesso",
-                                "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-
-                        UserLoginScreen frame = new UserLoginScreen();
-                        frame.setContentPane(frame.mainPanel);
-                        createFrame(frame, "BeeCorp");
-                        closeFrame(UserRegisterScreen.this);
-
-                    } catch (SQLIntegrityConstraintViolationException ex) {
-                        JOptionPane.showMessageDialog(null, "Email já cadastrado",
+                    if (!emailMatcher.matches()) {
+                        JOptionPane.showMessageDialog(null, "Digite um Email valido",
                                 "Alerta de Erro", JOptionPane.WARNING_MESSAGE);
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(null, "Houve um erro na conexão com o banco de dados",
+                    }
+
+                    Pattern VALID_PHONE_ADDRESS_REGEX = Pattern.compile("^(?:\\+55\\s?)?(?:\\(?[1-9][0-9]\\)?\\s?)?[9]?[0-9]{4}\\s?[0-9]{4}$", Pattern.CASE_INSENSITIVE);
+                    Matcher phoneMatcher = VALID_PHONE_ADDRESS_REGEX.matcher(registerModel.getUserPhone());
+
+                    if (!phoneMatcher.matches()) {
+                        JOptionPane.showMessageDialog(null, "Digite um telefone valido",
                                 "Alerta de Erro", JOptionPane.WARNING_MESSAGE);
+                    }
+
+                    if (emailMatcher.matches() && phoneMatcher.matches()) {
+
+                        try {
+                            String sql = "INSERT INTO bee_manager_system.tb_users(nm_user,user_role,ds_email,ps_password,nr_phone,nr_cep,ds_address,dt_creation)" +
+                                    "VALUES(?,?,?,?,?,?,?,?);";
+
+                            PreparedStatement ps = JdbcConnection.getConnection().prepareStatement(sql);
+                            ps.setString(1, registerModel.getUserName());
+                            ps.setString(2, "NORMAL");
+                            ps.setString(3, registerModel.getUserEmail());
+                            ps.setString(4, registerModel.getUserPassword());
+                            ps.setString(5, registerModel.getUserPhone());
+                            ps.setString(6, registerModel.getUserZipCode());
+                            ps.setString(7, registerModel.getUserAddress());
+                            ps.setDate(8, new java.sql.Date(System.currentTimeMillis()));
+                            ps.executeUpdate();
+                            ps.close();
+
+                            JOptionPane.showMessageDialog(null, "Usuario cadastrado com sucesso",
+                                    "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+
+                            UserLoginScreen frame = new UserLoginScreen();
+                            frame.setContentPane(frame.mainPanel);
+                            createFrame(frame, "BeeCorp", false);
+                            closeFrame(UserRegisterScreen.this);
+
+                        } catch (SQLIntegrityConstraintViolationException ex) {
+                            JOptionPane.showMessageDialog(null, "Email já cadastrado",
+                                    "Alerta de Erro", JOptionPane.WARNING_MESSAGE);
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                            JOptionPane.showMessageDialog(null, "Houve um erro na conexão com o banco de dados",
+                                    "Alerta de Erro", JOptionPane.WARNING_MESSAGE);
+                        }
                     }
                 }
             }
         });
-    }
-
-    private static List<String> getEmptyFields(UserRegisterModel registerModel) {
-        var fields = new ArrayList<Field>();
-        for (var field : UserRegisterModel.class.getDeclaredFields()) {
-            field.setAccessible(true);
-            fields.add(field);
-        }
-
-        List<String> emptyFields = new ArrayList<>();
-        for (Field field : fields) {
-            try {
-                if (StringUtils.isNullOrEmpty(field.get(registerModel).toString())) {
-                    emptyFields.add(field.getName());
-                }
-            } catch (IllegalAccessException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-        return emptyFields;
     }
 }

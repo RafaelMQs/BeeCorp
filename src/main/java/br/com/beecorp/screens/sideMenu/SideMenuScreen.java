@@ -2,6 +2,8 @@ package br.com.beecorp.screens.sideMenu;
 
 import br.com.beecorp.models.DefaultScreenAbstract;
 import br.com.beecorp.models.DefaultScreenInterface;
+import br.com.beecorp.screens.auth.UserLoginScreen;
+
 import br.com.beecorp.screens.sideMenu.hive.HiveScreen;
 import br.com.beecorp.screens.sideMenu.user.UserScreen;
 
@@ -59,6 +61,10 @@ public class SideMenuScreen extends DefaultScreenAbstract implements DefaultScre
         logoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                UserLoginScreen frame = new UserLoginScreen();
+                frame.setContentPane(frame.mainPanel);
+                createFrame(frame, "BeeCorp", false);
+                closeFrame(SideMenuScreen.this);
             }
         });
     }
