@@ -4,6 +4,7 @@ import br.com.beecorp.jdbc.JdbcConnection;
 import br.com.beecorp.models.DefaultScreenAbstract;
 import br.com.beecorp.models.DefaultScreenInterface;
 import br.com.beecorp.models.UserRegisterModel;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -91,7 +92,7 @@ public class UserRegisterScreen extends DefaultScreenAbstract implements Default
                                 "Alerta de Erro", JOptionPane.WARNING_MESSAGE);
                     }
 
-                    Pattern VALID_PHONE_ADDRESS_REGEX = Pattern.compile("^(?:\\+55\\s?)?(?:\\(?[1-9][0-9]\\)?\\s?)?[9]?[0-9]{4}\\s?[0-9]{4}$", Pattern.CASE_INSENSITIVE);
+                    Pattern VALID_PHONE_ADDRESS_REGEX = Pattern.compile("^(?:\\+55\\s?)?\\(?[1-9][0-9]\\)?\\s?[9]?[0-9]{4}\\s?[0-9]{4}$", Pattern.CASE_INSENSITIVE);
                     Matcher phoneMatcher = VALID_PHONE_ADDRESS_REGEX.matcher(registerModel.getUserPhone());
 
                     if (!phoneMatcher.matches()) {
@@ -109,7 +110,7 @@ public class UserRegisterScreen extends DefaultScreenAbstract implements Default
                             ps.setString(1, registerModel.getUserName());
                             ps.setString(2, "NORMAL");
                             ps.setString(3, registerModel.getUserEmail());
-                            ps.setString(4, registerModel.getUserPassword());
+                            ps.setString(4, BCrypt.hashpw(registerModel.getUserPassword(), BCrypt.gensalt()));
                             ps.setString(5, registerModel.getUserPhone());
                             ps.setString(6, registerModel.getUserZipCode());
                             ps.setString(7, registerModel.getUserAddress());

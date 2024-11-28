@@ -4,6 +4,7 @@ import br.com.beecorp.jdbc.JdbcConnection;
 import br.com.beecorp.models.DefaultScreenAbstract;
 import br.com.beecorp.models.DefaultScreenInterface;
 import br.com.beecorp.models.UserRegisterModel;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -78,7 +79,7 @@ public class UserRegisterModal extends DefaultScreenAbstract implements DefaultS
                         ps.setString(1, registerModel.getUserName());
                         ps.setString(2, "NORMAL");
                         ps.setString(3, registerModel.getUserEmail());
-                        ps.setString(4, registerModel.getUserPassword());
+                        ps.setString(4, BCrypt.hashpw(registerModel.getUserPassword(), BCrypt.gensalt()));
                         ps.setString(5, registerModel.getUserPhone());
                         ps.setString(6, registerModel.getUserZipCode());
                         ps.setString(7, registerModel.getUserAddress());

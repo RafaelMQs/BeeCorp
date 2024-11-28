@@ -6,6 +6,7 @@ import br.com.beecorp.models.DefaultScreenAbstract;
 import br.com.beecorp.models.DefaultScreenInterface;
 import br.com.beecorp.models.UserModel;
 import br.com.beecorp.screens.sideMenu.SideMenuScreen;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -113,7 +114,7 @@ public class UserLoginScreen extends DefaultScreenAbstract implements DefaultScr
         UserModel userLogin = null;
         for (UserModel userModel : userModels) {
             if (Objects.equals(userModel.getUserEmail(), userEmail)
-                    && Objects.equals(userModel.getUserPassword(), userPassword)) {
+                    && BCrypt.checkpw(userPassword, userModel.getUserPassword())) {
                 userLogin = userModel;
                 break;
             }
